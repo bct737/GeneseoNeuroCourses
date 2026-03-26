@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --surface: #fffdf8;
+    --border: #d9d4c7;
+    --text: #1a1714;
+    --text-muted: #7a7368;
+    --accent-bio: #3a6b4a;
+    --accent-phys: #1e3f6e;
+    --accent-math: #7a3e1a;
+    --accent-psyc: #5a2d6b;
+    --accent-neur: #2d5a6b;
+    --tag-bg: #ede9df;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 3rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  input[type="search"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="search"]:focus { border-color: #888; }
+
+  .filter-group {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .filter-btn:hover { background: #eae6db; color: var(--text); }
+
+  .filter-btn.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .filter-btn[data-subject="biology"].active   { background: var(--accent-bio);  border-color: var(--accent-bio);  }
+  .filter-btn[data-subject="physics"].active   { background: var(--accent-phys); border-color: var(--accent-phys); }
+  .filter-btn[data-subject="math"].active      { background: var(--accent-math); border-color: var(--accent-math); }
+  .filter-btn[data-subject="psychology"].active{ background: var(--accent-psyc); border-color: var(--accent-psyc); }
+  .filter-btn[data-subject="neuroscience"].active { background: var(--accent-neur); border-color: var(--accent-neur); }
+
+  /* ─── MAIN LAYOUT ────────────────────────────────── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  .result-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── COURSE LIST ────────────────────────────────── */
+  .course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .course-item {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  .course-item:last-child { border-bottom: none; }
+
+  .course-row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .course-row:hover { background: #f0ece2; }
+
+  .course-item.expanded .course-row { background: #f0ece2; }
+
+  .course-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .course-code.biology    { color: var(--accent-bio);  }
+  .course-code.physics    { color: var(--accent-phys); }
+  .course-code.math       { color: var(--accent-math); }
+  .course-code.psychology { color: var(--accent-psyc); }
+  .course-code.neuroscience { color: var(--accent-neur); }
+
+  .course-title-text {
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .course-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .course-item.expanded .chevron { transform: rotate(180deg); }
+
+  /* ─── DETAIL PANEL ───────────────────────────────── */
+  .course-detail {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    animation: slideDown 0.18s ease;
+  }
+
+  .course-item.expanded .course-detail { display: block; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 0 0.75rem;
+    border-top: 1px solid var(--border);
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-subject-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 2px;
+    background: var(--tag-bg);
+    color: var(--text-muted);
+  }
+
+  .sections-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  .sections-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    background: #f7f4ed;
+    font-weight: 500;
+  }
+
+  .sections-table td {
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px solid #ede9df;
+    vertical-align: middle;
+    font-style: italic;
+  }
+
+  .sections-table tr:last-child td { border-bottom: none; }
+
+  .sections-table tr:hover td { background: #f7f4ed; }
+
+  .sections-table td.mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-style: normal;
+  }
+
+  .avail-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-style: normal;
+    padding: 0.15rem 0.45rem;
+    border-radius: 2px;
+  }
+
+  .avail-open  { background: #dff0e4; color: #2a6b3a; }
+  .avail-full  { background: #fde8e8; color: #9b2222; }
+
+  .elective-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-style: normal;
+    padding: 0.15rem 0.45rem;
+    border-radius: 2px;
+  }
+  .elective-elective { background: #e8f0fb; color: #1e3f6e; }
+  .elective-waiver   { background: #f5e8fb; color: #5a2d6b; }
+
+  .instructor-select {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    padding: 0.35rem 1.8rem 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--text);
+    color: var(--bg);
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23f5f2eb' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.55rem center;
+    transition: border-color 0.15s, color 0.15s;
+    text-transform: uppercase;
+  }
+  .instructor-select:hover, .instructor-select:focus { border-color: var(--text); color: var(--bg); }
+
+  /* ─── EMPTY STATE ────────────────────────────────── */
+  .empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 640px) {
+    header { padding: 1.25rem 1rem 1rem; }
+    main   { padding: 1.25rem 1rem 3rem; }
+    .course-row { grid-template-columns: 5.5rem 1fr auto; gap: 0.5rem; padding: 0.85rem 1rem; }
+    .sections-table { font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>Course Catalog</h1>
+    <span class="subtitle">Fall 2026</span>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="search" placeholder="Search courses…" autocomplete="off">
+    </div>
+    <div class="filter-group" id="filters">
+      <button class="filter-btn active" data-subject="all">All</button>
+      <button class="filter-btn" data-subject="biology">Biology</button>
+      <button class="filter-btn" data-subject="math">Math</button>
+      <button class="filter-btn" data-subject="neuroscience">Neuroscience</button>
+      <button class="filter-btn" data-subject="physics">Physics</button>
+      <button class="filter-btn" data-subject="psychology">Psychology</button>
+    </div>
+    <div class="filter-group" id="elective-filters">
+      <button class="filter-btn active" data-elective="all">All Types</button>
+      <button class="filter-btn" data-elective="Elective">Elective</button>
+      <button class="filter-btn" data-elective="Waiver Req.">Waiver Req.</button>
+    </div>
+    <select class="instructor-select" id="instructor-filter">
+      <option value="all">All Instructors</option>
+      <option value="Baecker, Joshua">Baecker, Joshua</option>
+      <option value="Bailey, Travis">Bailey, Travis</option>
+      <option value="Bechard, Allison">Bechard, Allison</option>
+      <option value="Burch, Sara">Burch, Sara</option>
+      <option value="Carrera, Heather">Carrera, Heather</option>
+      <option value="Cole, Logan">Cole, Logan</option>
+      <option value="Fletcher, Kurt">Fletcher, Kurt</option>
+      <option value="Freeman, Charles">Freeman, Charles</option>
+      <option value="Haddad, Caroline">Haddad, Caroline</option>
+      <option value="Hutchison, Betsy">Hutchison, Betsy</option>
+      <option value="Jamburuthugoda, Varuni">Jamburuthugoda, Varuni</option>
+      <option value="Kedzierawski, Andrzej">Kedzierawski, Andrzej</option>
+      <option value="Lewis, Jani">Lewis, Jani</option>
+      <option value="Lynch, Michael">Lynch, Michael</option>
+      <option value="Marcus, George">Marcus, George</option>
+      <option value="Markowski, Vincent">Markowski, Vincent</option>
+      <option value="Merrilees, Christine">Merrilees, Christine</option>
+      <option value="Militello, Kevin">Militello, Kevin</option>
+      <option value="Morris, Nathan">Morris, Nathan</option>
+      <option value="Mounts, Jeffrey">Mounts, Jeffrey</option>
+      <option value="Newberry, Sam">Newberry, Sam</option>
+      <option value="Okoye, Chidozie">Okoye, Chidozie</option>
+      <option value="Osburn, Thomas">Osburn, Thomas</option>
+      <option value="Ozubko, Jason">Ozubko, Jason</option>
+      <option value="Padalino, Stephen">Padalino, Stephen</option>
+      <option value="Pogozelski, Edward">Pogozelski, Edward</option>
+      <option value="Sweet, Tara">Sweet, Tara</option>
+      <option value="Taber-Thomas, Bradley">Taber-Thomas, Bradley</option>
+      <option value="Van Stolk-Cooke, Cassie">Van Stolk-Cooke, Cassie</option>
+      <option value="Wade, Amy">Wade, Amy</option>
+    </select>
+  </div>
+</header>
+
+<main>
+  <p class="result-count" id="count"></p>
+  <div class="course-list" id="courseList"></div>
+  <div class="empty" id="empty" style="display:none;">No courses match your search.</div>
+</main>
+
+<script>
+const COURSES = [
+  {"course":"BIOL 210","title":"Nutrition","subject":"biology","elective":"Elective","sections":[{"crn":"19985","credits":"3.0","attributes":"LASC","instructor":"Carrera, Heather","days_times":"R: 1530-1645"},{"crn":"22159","credits":"3.0","attributes":"LASC","instructor":"Newberry, Sam","days_times":"MW: 1400-1515"}]},
+  {"course":"BIOL 222","title":"Principles of Genetics","subject":"biology","elective":"Elective","sections":[{"crn":"13049","credits":"3.0","attributes":"LASC","instructor":"Hutchison, Betsy","days_times":"MWF: 1030-1120"},{"crn":"13911","credits":"3.0","attributes":"LASC","instructor":"Militello, Kevin","days_times":"MWF: 1130-1220"},{"crn":"19987","credits":"3.0","attributes":"LASC","instructor":"Hutchison, Betsy","days_times":"MWF: 930-1020"}]},
+  {"course":"BIOL 223","title":"Genetics Laboratory","subject":"biology","elective":"Elective","sections":[{"crn":"16105","credits":"1.0","attributes":"B200, LASC","instructor":"Morris, Nathan","days_times":"T: 1400-1650"},{"crn":"21496","credits":"1.0","attributes":"B200, LASC","instructor":"Morris, Nathan","days_times":"R: 1400-1650"}]},
+  {"course":"BIOL 300","title":"Cell Biology","subject":"biology","elective":"Elective","sections":[{"crn":"14396","credits":"3.0","attributes":"LASC","instructor":"Bailey, Travis","days_times":"MWF: 830-920"}]},
+  {"course":"BIOL 304","title":"Biotechnology","subject":"biology","elective":"Elective","sections":[{"crn":"22536","credits":"3.0","attributes":"LASC","instructor":"Lewis, Jani","days_times":"MW: 1530-1645"}]},
+  {"course":"BIOL 322","title":"Molecular Biology","subject":"biology","elective":"Elective","sections":[{"crn":"16280","credits":"3.0","attributes":"LASC","instructor":"Militello, Kevin","days_times":"TR: 930-1045"}]},
+  {"course":"BIOL 335","title":"Foundations of Biochemistry","subject":"biology","elective":"Elective","sections":[{"crn":"17773","credits":"3.0","attributes":"LASC","instructor":"Jamburuthugoda, Varuni","days_times":"MWF: 930-1020"},{"crn":"21139","credits":"3.0","attributes":"LASC","instructor":"Jamburuthugoda, Varuni","days_times":"MWF: 1030-1120"}]},
+  {"course":"BIOL 350","title":"Applied Biostatistics","subject":"biology","elective":"Elective","sections":[{"crn":"22806","credits":"3.0","attributes":"LASC, REAS","instructor":"Cole, Logan","days_times":"TBD"}]},
+  {"course":"BIOL 365","title":"Anatomy & Physiology I","subject":"biology","elective":"Elective","sections":[{"crn":"20357","credits":"4.0","attributes":"B300, LASC","instructor":"Burch, Sara","days_times":"MWF: 1230-1320"},{"crn":"20358","credits":"0.0","attributes":"B300, LASC","instructor":"Newberry, Sam","days_times":"W: 830-1120"},{"crn":"20359","credits":"0.0","attributes":"B300, LASC","instructor":"Baecker, Joshua","days_times":"W: 1330-1620"},{"crn":"20360","credits":"0.0","attributes":"B300, LASC","instructor":"Baecker, Joshua","days_times":"R: 800-1050"},{"crn":"20362","credits":"0.0","attributes":"B300, LASC","instructor":"Burch, Sara","days_times":"R: 1100-1350"},{"crn":"21498","credits":"0.0","attributes":"B300, LASC","instructor":"Newberry, Sam","days_times":"R: 1400-1650"}]},
+  {"course":"BIOL 366","title":"Anatomy & Physiology II","subject":"biology","elective":"Elective","sections":[{"crn":"22529","credits":"4.0","attributes":"B300, LASC","instructor":"Okoye, Chidozie","days_times":"MWF: 1130-1220"},{"crn":"22530","credits":"0.0","attributes":"B300, LASC","instructor":"Baecker, Joshua","days_times":"T: 930-1220"},{"crn":"22531","credits":"0.0","attributes":"B300, LASC","instructor":"Okoye, Chidozie","days_times":"T: 1400-1650"}]},
+  {"course":"BIOL 390","title":"Molecular Techniques","subject":"biology","elective":"Elective","sections":[{"crn":"22845","credits":"2.0","attributes":"B300","instructor":"Militello, Kevin","days_times":"TBD"},{"crn":"22846","credits":"0.0","attributes":"B300","instructor":"Militello, Kevin","days_times":"W: 1400-1650"}]},
+  {"course":"MATH 222","title":"Calculus II","subject":"math","elective":"Elective","sections":[{"crn":"12800","credits":"4.0","attributes":"LASC","instructor":"Haddad, Caroline","days_times":"MW: 800-915; F: 830-920"},{"crn":"12801","credits":"4.0","attributes":"LASC","instructor":"Kedzierawski, Andrzej","days_times":"MW: 1230-1345; F: 1230-1320"}]},
+  {"course":"NEUR 301","title":"Hormones & Behavior","subject":"neuroscience","elective":"Waiver Req.","sections":[{"crn":"22768","credits":"3.0","attributes":"LASC","instructor":"Bechard, Allison","days_times":"TR: 930-1045"}]},
+  {"course":"NEUR 388","title":"Exp: Neurobiology of Disease","subject":"neuroscience","elective":"Waiver Req.","sections":[{"crn":"22850","credits":"3.0","attributes":"","instructor":"Sweet, Tara","days_times":"MW: 1230-1345"}]},
+  {"course":"PHYS 113","title":"General Physics I","subject":"physics","elective":"Elective","sections":[{"crn":"16631","credits":"3.0","attributes":"LASC, NLEC","instructor":"Pogozelski, Edward","days_times":"TR: 930-1045"},{"crn":"16632","credits":"3.0","attributes":"LASC, NLEC","instructor":"Padalino, Stephen","days_times":"TR: 1230-1345"}]},
+  {"course":"PHYS 114","title":"Physics I Lab","subject":"physics","elective":"Elective","sections":[{"crn":"16633","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"M: 1230-1420"},{"crn":"16634","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"M: 1430-1620"},{"crn":"16637","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"M: 1630-1820"},{"crn":"16638","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"T: 1230-1420"},{"crn":"16641","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"T: 1430-1620"},{"crn":"16642","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"T: 1630-1820"},{"crn":"16643","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"W: 1230-1420"},{"crn":"22277","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"W: 1430-1620"},{"crn":"22278","credits":"1.0","attributes":"LASC, NLAB","instructor":"Freeman, Charles","days_times":"W: 1630-1820"}]},
+  {"course":"PHYS 123","title":"Analytical Physics I","subject":"physics","elective":"Elective","sections":[{"crn":"14072","credits":"3.0","attributes":"LASC, NLEC","instructor":"Marcus, George","days_times":"MWF: 930-1020"},{"crn":"21888","credits":"3.0","attributes":"LASC, NLEC","instructor":"Freeman, Charles","days_times":"MWF: 1030-1120"}]},
+  {"course":"PHYS 124","title":"Analytical Physics I Lab","subject":"physics","elective":"Elective","sections":[{"crn":"14150","credits":"1.0","attributes":"LASC, NLAB","instructor":"Osburn, Thomas","days_times":"M: 1400-1650"},{"crn":"17744","credits":"1.0","attributes":"LASC, NLAB","instructor":"Fletcher, Kurt","days_times":"T: 1300-1550"}]},
+  {"course":"PSYC 260","title":"Intro to Psychopathology","subject":"psychology","elective":"Elective","sections":[{"crn":"15958","credits":"3.0","attributes":"LASC","instructor":"Van Stolk-Cooke, Cassie","days_times":"TR: 930-1045"},{"crn":"21794","credits":"3.0","attributes":"LASC","instructor":"Wade, Amy","days_times":"M: 1730-2000"}]},
+  {"course":"PSYC 305","title":"Top: Functional Neuroimaging","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"22763","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1700-1815"},{"crn":"22764","credits":"3.0","attributes":"LASC","instructor":"Merrilees, Christine","days_times":"TR: 1230-1345"}]},
+  {"course":"PSYC 307","title":"Sensation & Perception","subject":"psychology","elective":"Elective","sections":[{"crn":"22505","credits":"3.0","attributes":"LASC","instructor":"Mounts, Jeffrey","days_times":"MWF: 1230-1320"}]},
+  {"course":"PSYC 321","title":"Top: Dev Social-Cognitive Neuro","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21233","credits":"3.0","attributes":"LASC","instructor":"Taber-Thomas, Bradley","days_times":"TR: 1400-1515"}]},
+  {"course":"PSYC 331","title":"Topic: Drug Therapy","subject":"psychology","elective":"Elective","sections":[{"crn":"22765","credits":"3.0","attributes":"LASC","instructor":"Markowski, Vincent","days_times":"MWF: 1230-1320"}]},
+  {"course":"PSYC 366","title":"Developmental Psychopathology","subject":"psychology","elective":"Elective","sections":[{"crn":"15588","credits":"3.0","attributes":"LASC","instructor":"Lynch, Michael","days_times":"MWF: 1030-1120"},{"crn":"22767","credits":"3.0","attributes":"LASC","instructor":"Merrilees, Christine","days_times":"TR: 1100-1215"}]},
+  {"course":"PSYC 383","title":"Topic: Heuristics and Biases","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21798","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1400-1515"}]}
+];
+
+// ── helpers ──────────────────────────────────────────────
+function fmtTime(t) {
+  if (!t || t === 'TBD') return '<em style="color:var(--text-muted)">TBD</em>';
+  return t.replace(/(\d{3,4})/g, m => {
+    const h = Math.floor(m / 100), min = m % 100;
+    const ampm = h >= 12 ? 'pm' : 'am';
+    const hr = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+    return `${hr}:${String(min).padStart(2, '0')}${ampm}`;
+  });
+}
+
+// ── state ────────────────────────────────────────────────
+let activeSubject  = 'all';
+let activeElective = 'all';
+let activeInstructor = 'all';
+let searchQuery    = '';
+
+// ── render ───────────────────────────────────────────────
+function render() {
+  const list  = document.getElementById('courseList');
+  const empty = document.getElementById('empty');
+  const count = document.getElementById('count');
+
+  const filtered = COURSES.filter(c => {
+    const matchSubject    = activeSubject    === 'all' || c.subject   === activeSubject;
+    const matchElective   = activeElective   === 'all' || c.elective  === activeElective;
+    const matchInstructor = activeInstructor === 'all' || c.sections.some(s => s.instructor === activeInstructor);
+    const q = searchQuery.toLowerCase();
+    const matchSearch   = !q
+      || c.course.toLowerCase().includes(q)
+      || c.title.toLowerCase().includes(q)
+      || c.sections.some(s => s.instructor.toLowerCase().includes(q));
+    return matchSubject && matchElective && matchInstructor && matchSearch;
+  });
+
+  count.textContent = `${filtered.length} course${filtered.length !== 1 ? 's' : ''} found`;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display  = 'flex';
+
+  list.innerHTML = filtered.map((c, i) => {
+    const sCount     = c.sections.length;
+    const creditsSet = [...new Set(c.sections.map(s => s.credits).filter(x => x !== '0.0'))];
+    const credits    = creditsSet.join('/');
+    const isWaiver   = c.elective === 'Waiver Req.';
+
+    const rows = c.sections.map(s => `
+      <tr>
+        <td class="mono">${s.crn}</td>
+        <td>${s.instructor}</td>
+        <td>${fmtTime(s.days_times)}</td>
+        <td class="mono">${s.credits === '0.0' ? '—' : s.credits + ' cr'}</td>
+        <td><span class="elective-badge ${isWaiver ? 'elective-waiver' : 'elective-elective'}">${c.elective}</span></td>
+      </tr>`).join('');
+
+    return `
+    <div class="course-item" data-index="${i}">
+      <div class="course-row" onclick="toggle(${i})">
+        <span class="course-code ${c.subject}">${c.course}</span>
+        <span class="course-title-text">${c.title}</span>
+        <div class="course-meta">
+          <span class="section-badge">${sCount} section${sCount !== 1 ? 's' : ''} · ${credits} cr</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="course-detail">
+        <div class="detail-header">
+          <span class="detail-subject-tag">${c.subject}</span>
+        </div>
+        <table class="sections-table">
+          <thead>
+            <tr>
+              <th>CRN</th><th>Instructor</th><th>Days / Times</th>
+              <th>Credits</th><th>Elective</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(index) {
+  const items  = document.querySelectorAll('.course-item');
+  const item   = items[index];
+  const wasOpen = item.classList.contains('expanded');
+  items.forEach(el => el.classList.remove('expanded'));
+  if (!wasOpen) item.classList.add('expanded');
+}
+
+// ── subject filter ───────────────────────────────────────
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('[data-subject]');
+  if (!btn) return;
+  activeSubject = btn.dataset.subject;
+  document.querySelectorAll('#filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+});
+
+// ── elective filter ──────────────────────────────────────
+document.getElementById('elective-filters').addEventListener('click', e => {
+  const btn = e.target.closest('[data-elective]');
+  if (!btn) return;
+  activeElective = btn.dataset.elective;
+  document.querySelectorAll('#elective-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+});
+
+// ── instructor filter ────────────────────────────────────
+document.getElementById('instructor-filter').addEventListener('change', e => {
+  activeInstructor = e.target.value;
+  render();
+});
+
+// ── search ───────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
