@@ -470,13 +470,13 @@
 <header>
   <div class="header-top">
     <h1>Neuro Major Electives - Fall 2026</h1>
-    <div style="display:flex; flex-direction:column; gap:0.35rem; align-items:flex-end;">
-      <button class="show-instructions-btn" id="showInstructionsBtn" onclick="toggleInstructions()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Instructions
-      </button>
-      <button class="show-disclaimer-btn" id="showDisclaimerBtn" onclick="toggleDisclaimer()">⚠ Warning: For Planning Only</button>
-    </div>
+  </div>
+  <div style="display:flex; gap:0.5rem; margin-bottom:0.4rem;">
+    <button class="show-instructions-btn" id="showInstructionsBtn" onclick="toggleInstructions()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Instructions
+    </button>
+    <button class="show-disclaimer-btn" id="showDisclaimerBtn" onclick="toggleDisclaimer()">⚠ For Planning Only</button>
   </div>
   <p class="instructions" id="instructions"><svg style="display:inline;vertical-align:middle;margin-right:0.35rem;color:#1e3f6e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Use the filters below to browse by subject, instructor, and whether waiver is required. Click any course to see available sections and meeting times. Courses marked <strong>Waiver Req.</strong> require your advisor to submit a waiver before they can count toward the major — check with your advisor before registering.</p>
   <p class="disclaimer" id="disclaimer"><span style="color: red;">⚠</span> This list is for planning purposes only. Always check the course catalogue for up-to-date course offerings, and confirm your registration plans in Degree Works and with your advisor.</p>
@@ -488,7 +488,7 @@
     </div>
     <button class="filters-toggle-btn" id="filtersToggleBtn" onclick="toggleFilters()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      Filters
+      Hide Filters
     </button>
   </div>
   <div class="filters-collapsible" id="filtersCollapsible">
@@ -570,12 +570,12 @@ const COURSES = [
   {"course":"PHYS 123","title":"Analytical Physics I","subject":"physics","elective":"Elective","sections":[{"crn":"14072","credits":"3.0","attributes":"LASC, NLEC","instructor":"Marcus, George","days_times":"MWF: 930-1020"},{"crn":"21888","credits":"3.0","attributes":"LASC, NLEC","instructor":"Freeman, Charles","days_times":"MWF: 1030-1120"}]},
   {"course":"PHYS 124","title":"Analytical Physics I Lab","subject":"physics","elective":"Elective","sections":[{"crn":"14150","credits":"1.0","attributes":"LASC, NLAB","instructor":"Osburn, Thomas","days_times":"M: 1400-1650"},{"crn":"17744","credits":"1.0","attributes":"LASC, NLAB","instructor":"Fletcher, Kurt","days_times":"T: 1300-1550"}]},
   {"course":"PSYC 260","title":"Intro to Psychopathology","subject":"psychology","elective":"Elective","sections":[{"crn":"15958","credits":"3.0","attributes":"LASC","instructor":"Van Stolk-Cooke, Cassie","days_times":"TR: 930-1045"},{"crn":"21794","credits":"3.0","attributes":"LASC","instructor":"Wade, Amy","days_times":"M: 1730-2000"}]},
-  {"course":"PSYC 305","title":"Top: Functional Neuroimaging","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"22763","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1700-1815"},{"crn":"22764","credits":"3.0","attributes":"LASC","instructor":"Merrilees, Christine","days_times":"TR: 1230-1345"}]},
+  {"course":"PSYC 305","title":"Top: Applied Methods","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"22763","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1700-1815","topic":"Functional Neuroimaging"},{"crn":"22764","credits":"3.0","attributes":"LASC","instructor":"Merrilees, Christine","days_times":"TR: 1230-1345","topic":"Multivariate Stats"}]},
   {"course":"PSYC 307","title":"Sensation & Perception","subject":"psychology","elective":"Elective","sections":[{"crn":"22505","credits":"3.0","attributes":"LASC","instructor":"Mounts, Jeffrey","days_times":"MWF: 1230-1320"}]},
-  {"course":"PSYC 321","title":"Top: Dev Social-Cognitive Neuro","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21233","credits":"3.0","attributes":"LASC","instructor":"Taber-Thomas, Bradley","days_times":"TR: 1400-1515"}]},
-  {"course":"PSYC 331","title":"Topic: Drug Therapy","subject":"psychology","elective":"Elective","sections":[{"crn":"22765","credits":"3.0","attributes":"LASC","instructor":"Markowski, Vincent","days_times":"MWF: 1230-1320"}]},
+  {"course":"PSYC 321","title":"Top: Developmental Psyc","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21233","credits":"3.0","attributes":"LASC","instructor":"Taber-Thomas, Bradley","days_times":"TR: 1400-1515","topic":"Developmental Social-Cognitive Neuro"}]},
+  {"course":"PSYC 331","title":"Top: Neural/Chem Basis of Behav","subject":"psychology","elective":"Elective","sections":[{"crn":"22765","credits":"3.0","attributes":"LASC","instructor":"Markowski, Vincent","days_times":"MWF: 1230-1320","topic":"Drug Therapy"}]},
   {"course":"PSYC 366","title":"Developmental Psychopathology","subject":"psychology","elective":"Elective","sections":[{"crn":"15588","credits":"3.0","attributes":"LASC","instructor":"Lynch, Michael","days_times":"MWF: 1030-1120"},{"crn":"22767","credits":"3.0","attributes":"LASC","instructor":"Merrilees, Christine","days_times":"TR: 1100-1215"}]},
-  {"course":"PSYC 383","title":"Topic: Heuristics and Biases","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21798","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1400-1515"}]}
+  {"course":"PSYC 383","title":"Top: Adv Cog Psyc","subject":"psychology","elective":"Waiver Req.","sections":[{"crn":"21798","credits":"3.0","attributes":"LASC","instructor":"Ozubko, Jason","days_times":"TR: 1400-1515","topic":"Heuristics and Biases"}]}
 ];
 
 // ── helpers ──────────────────────────────────────────────
@@ -595,21 +595,47 @@ let activeElective = 'all';
 let activeInstructor = 'all';
 let searchQuery    = '';
 
+// ── day search aliases ───────────────────────────────────
+const DAY_ALIASES = {
+  monday:    'M', mon: 'M', m: 'M',
+  tuesday:   'T', tue: 'T', tues: 'T',
+  wednesday: 'W', wed: 'W', w: 'W',
+  thursday:  'R', thu: 'R', thur: 'R', thurs: 'R',
+  friday:    'F', fri: 'F', f: 'F',
+  mw: 'MW', mwf: 'MWF',
+  tr: 'TR', tth: 'TR', ttr: 'TR',
+};
+
+function matchesDay(q, days_times) {
+  if (!days_times || days_times === 'TBD') return false;
+  const dt = days_times.toLowerCase();
+  const canonical = DAY_ALIASES[q];
+  if (canonical) {
+    // Match the canonical pattern at a word boundary in the original days_times string
+    const re = new RegExp('(?<![A-Z])' + canonical.split('').join('') + '(?![A-Z])', 'i');
+    return re.test(days_times);
+  }
+  return dt.includes(q);
+}
+
 // ── render ───────────────────────────────────────────────
 function render() {
   const list  = document.getElementById('courseList');
   const empty = document.getElementById('empty');
   const count = document.getElementById('count');
 
+  const q = searchQuery.toLowerCase().trim();
+
   const filtered = COURSES.filter(c => {
     const matchSubject    = activeSubject    === 'all' || c.subject   === activeSubject;
     const matchElective   = activeElective   === 'all' || c.elective  === activeElective;
     const matchInstructor = activeInstructor === 'all' || c.sections.some(s => s.instructor === activeInstructor);
-    const q = searchQuery.toLowerCase();
     const matchSearch   = !q
       || c.course.toLowerCase().includes(q)
       || c.title.toLowerCase().includes(q)
-      || c.sections.some(s => s.instructor.toLowerCase().includes(q));
+      || c.sections.some(s => s.instructor.toLowerCase().includes(q))
+      || c.sections.some(s => s.topic && s.topic.toLowerCase().includes(q))
+      || c.sections.some(s => matchesDay(q, s.days_times));
     return matchSubject && matchElective && matchInstructor && matchSearch;
   });
 
@@ -631,10 +657,27 @@ function render() {
     const credits    = creditsSet.join('/');
     const isWaiver   = c.elective === 'Waiver Req.';
 
-    const rows = c.sections.map(s => `
+    const isTop = c.title.startsWith('Top:');
+
+    const visibleSections = q
+      ? c.sections.filter(s =>
+          s.instructor.toLowerCase().includes(q)
+          || (s.topic && s.topic.toLowerCase().includes(q))
+          || matchesDay(q, s.days_times)
+          || c.course.toLowerCase().includes(q)
+          || c.title.toLowerCase().includes(q)
+        )
+      : c.sections;
+
+    const visibleCount = visibleSections.length;
+    const creditsSetVisible = [...new Set(visibleSections.map(s => s.credits).filter(x => x !== '0.0'))];
+    const creditsVisible = creditsSetVisible.join('/');
+
+    const rows = visibleSections.map(s => `
       <tr>
         <td class="mono">${s.crn}</td>
         <td>${s.instructor}</td>
+        ${isTop ? `<td>${s.topic || '—'}</td>` : ''}
         <td>${fmtTime(s.days_times)}</td>
         <td class="mono">${s.credits === '0.0' ? '—' : s.credits + ' cr'}</td>
         <td><span class="elective-badge ${isWaiver ? 'elective-waiver' : 'elective-elective'}">${c.elective}</span></td>
@@ -646,7 +689,7 @@ function render() {
         <span class="course-code ${c.subject}">${c.course}</span>
         <span class="course-title-text">${c.title}</span>
         <div class="course-meta">
-          <span class="section-badge">${sCount} section${sCount !== 1 ? 's' : ''} · ${credits} cr</span>
+          <span class="section-badge">${visibleCount} section${visibleCount !== 1 ? 's' : ''} · ${creditsVisible} cr</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
@@ -657,7 +700,7 @@ function render() {
         <table class="sections-table">
           <thead>
             <tr>
-              <th>CRN</th><th>Instructor</th><th>Days / Times</th>
+              <th>CRN</th><th>Instructor</th>${isTop ? '<th>Topic</th>' : ''}<th>Days / Times</th>
               <th>Credits</th><th>Elective</th>
             </tr>
           </thead>
@@ -742,6 +785,7 @@ function toggleFilters() {
   const btn = document.getElementById('filtersToggleBtn');
   collapsible.classList.toggle('collapsed', !filtersVisible);
   btn.classList.toggle('collapsed', !filtersVisible);
+  btn.childNodes[btn.childNodes.length - 1].textContent = filtersVisible ? ' Hide Filters' : ' Show Filters';
 }
 
 render();
