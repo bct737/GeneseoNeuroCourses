@@ -66,7 +66,16 @@
     color: var(--text-muted);
     line-height: 1.6;
     margin-bottom: 1rem;
-    max-width: 720px;
+    overflow: hidden;
+    max-height: 200px;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 1;
+  }
+
+  .instructions.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
   }
 
   .instructions strong {
@@ -80,7 +89,88 @@
     line-height: 1.5;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    max-width: 720px;
+    overflow: hidden;
+    max-height: 100px;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 1;
+  }
+
+  .disclaimer.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  .show-disclaimer-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid #e8b4b4;
+    border-radius: 3px;
+    background: var(--bg);
+    color: #9b4444;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+  .show-disclaimer-btn:hover { background: #fde8e8; }
+
+  /* ─── SHOW INSTRUCTIONS BUTTON ───────────────────── */
+  .show-instructions-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+  .show-instructions-btn:hover { background: #eae6db; color: var(--text); }
+
+  /* ─── FILTERS TOGGLE ─────────────────────────────── */
+  .filters-toggle-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+  .filters-toggle-btn:hover { background: #eae6db; color: var(--text); }
+  .filters-toggle-btn svg { transition: transform 0.2s ease; }
+  .filters-toggle-btn.collapsed svg { transform: rotate(-90deg); }
+
+  .filters-collapsible {
+    overflow: hidden;
+    max-height: 200px;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+  }
+  .filters-collapsible.collapsed {
+    max-height: 0;
+    opacity: 0;
   }
 
   .controls {
@@ -380,61 +470,76 @@
 <header>
   <div class="header-top">
     <h1>Neuro Major Electives - Fall 2026</h1>
+    <div style="display:flex; flex-direction:column; gap:0.35rem; align-items:flex-end;">
+      <button class="show-instructions-btn" id="showInstructionsBtn" onclick="toggleInstructions()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Instructions
+      </button>
+      <button class="show-disclaimer-btn" id="showDisclaimerBtn" onclick="toggleDisclaimer()">⚠ Warning: For Planning Only</button>
+    </div>
   </div>
-  <p class="instructions">Use the filters below to browse by subject, instructor, and whether waiver is required. Click any course to see available sections and meeting times. Courses marked <strong>Waiver Req.</strong> require your advisor to submit a waiver before they can count toward the major — check with your advisor before registering.</p>
-  <p class="disclaimer"><span style="color: red;">⚠</span> This list is for planning purposes only. Always check the course catalogue for up-to-date course offerings, and confirm your registration plans in Degree Works and with your advisor.</p>
+  <p class="instructions" id="instructions"><svg style="display:inline;vertical-align:middle;margin-right:0.35rem;color:#1e3f6e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Use the filters below to browse by subject, instructor, and whether waiver is required. Click any course to see available sections and meeting times. Courses marked <strong>Waiver Req.</strong> require your advisor to submit a waiver before they can count toward the major — check with your advisor before registering.</p>
+  <p class="disclaimer" id="disclaimer"><span style="color: red;">⚠</span> This list is for planning purposes only. Always check the course catalogue for up-to-date course offerings, and confirm your registration plans in Degree Works and with your advisor.</p>
   <br>
   <div class="controls">
     <div class="search-wrap">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="search" id="search" placeholder="Search courses…" autocomplete="off">
     </div>
-    <div class="filter-group" id="filters">
-      <button class="filter-btn active" data-subject="all">All</button>
-      <button class="filter-btn" data-subject="biology">Biology</button>
-      <button class="filter-btn" data-subject="math">Math</button>
-      <button class="filter-btn" data-subject="neuroscience">Neuroscience</button>
-      <button class="filter-btn" data-subject="physics">Physics</button>
-      <button class="filter-btn" data-subject="psychology">Psychology</button>
+    <button class="filters-toggle-btn" id="filtersToggleBtn" onclick="toggleFilters()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      Filters
+    </button>
+  </div>
+  <div class="filters-collapsible" id="filtersCollapsible">
+    <div class="controls" style="margin-top: 0.5rem;">
+      <div class="filter-group" id="filters">
+        <button class="filter-btn active" data-subject="all">All</button>
+        <button class="filter-btn" data-subject="biology">Biol</button>
+        <button class="filter-btn" data-subject="math">Math</button>
+        <button class="filter-btn" data-subject="neuroscience">Neur</button>
+        <button class="filter-btn" data-subject="physics">Phys</button>
+        <button class="filter-btn" data-subject="psychology">Psyc</button>
+      </div>
+      <div class="filter-group" id="elective-filters">
+        <button class="filter-btn active" data-elective="all">All Types</button>
+        <button class="filter-btn" data-elective="Elective">Elective</button>
+        <button class="filter-btn" data-elective="Waiver Req.">Waiver Req.</button>
+      </div>
+      <select class="instructor-select" id="instructor-filter">
+        <option value="all">All Instructors</option>
+        <option value="Baecker, Joshua">Baecker, Joshua</option>
+        <option value="Bailey, Travis">Bailey, Travis</option>
+        <option value="Bechard, Allison">Bechard, Allison</option>
+        <option value="Burch, Sara">Burch, Sara</option>
+        <option value="Carrera, Heather">Carrera, Heather</option>
+        <option value="Cole, Logan">Cole, Logan</option>
+        <option value="Fletcher, Kurt">Fletcher, Kurt</option>
+        <option value="Freeman, Charles">Freeman, Charles</option>
+        <option value="Haddad, Caroline">Haddad, Caroline</option>
+        <option value="Hutchison, Betsy">Hutchison, Betsy</option>
+        <option value="Jamburuthugoda, Varuni">Jamburuthugoda, Varuni</option>
+        <option value="Kedzierawski, Andrzej">Kedzierawski, Andrzej</option>
+        <option value="Lewis, Jani">Lewis, Jani</option>
+        <option value="Lynch, Michael">Lynch, Michael</option>
+        <option value="Marcus, George">Marcus, George</option>
+        <option value="Markowski, Vincent">Markowski, Vincent</option>
+        <option value="Merrilees, Christine">Merrilees, Christine</option>
+        <option value="Militello, Kevin">Militello, Kevin</option>
+        <option value="Morris, Nathan">Morris, Nathan</option>
+        <option value="Mounts, Jeffrey">Mounts, Jeffrey</option>
+        <option value="Newberry, Sam">Newberry, Sam</option>
+        <option value="Okoye, Chidozie">Okoye, Chidozie</option>
+        <option value="Osburn, Thomas">Osburn, Thomas</option>
+        <option value="Ozubko, Jason">Ozubko, Jason</option>
+        <option value="Padalino, Stephen">Padalino, Stephen</option>
+        <option value="Pogozelski, Edward">Pogozelski, Edward</option>
+        <option value="Sweet, Tara">Sweet, Tara</option>
+        <option value="Taber-Thomas, Bradley">Taber-Thomas, Bradley</option>
+        <option value="Van Stolk-Cooke, Cassie">Van Stolk-Cooke, Cassie</option>
+        <option value="Wade, Amy">Wade, Amy</option>
+      </select>
     </div>
-    <div class="filter-group" id="elective-filters">
-      <button class="filter-btn active" data-elective="all">All Types</button>
-      <button class="filter-btn" data-elective="Elective">Elective</button>
-      <button class="filter-btn" data-elective="Waiver Req.">Waiver Req.</button>
-    </div>
-    <select class="instructor-select" id="instructor-filter">
-      <option value="all">All Instructors</option>
-      <option value="Baecker, Joshua">Baecker, Joshua</option>
-      <option value="Bailey, Travis">Bailey, Travis</option>
-      <option value="Bechard, Allison">Bechard, Allison</option>
-      <option value="Burch, Sara">Burch, Sara</option>
-      <option value="Carrera, Heather">Carrera, Heather</option>
-      <option value="Cole, Logan">Cole, Logan</option>
-      <option value="Fletcher, Kurt">Fletcher, Kurt</option>
-      <option value="Freeman, Charles">Freeman, Charles</option>
-      <option value="Haddad, Caroline">Haddad, Caroline</option>
-      <option value="Hutchison, Betsy">Hutchison, Betsy</option>
-      <option value="Jamburuthugoda, Varuni">Jamburuthugoda, Varuni</option>
-      <option value="Kedzierawski, Andrzej">Kedzierawski, Andrzej</option>
-      <option value="Lewis, Jani">Lewis, Jani</option>
-      <option value="Lynch, Michael">Lynch, Michael</option>
-      <option value="Marcus, George">Marcus, George</option>
-      <option value="Markowski, Vincent">Markowski, Vincent</option>
-      <option value="Merrilees, Christine">Merrilees, Christine</option>
-      <option value="Militello, Kevin">Militello, Kevin</option>
-      <option value="Morris, Nathan">Morris, Nathan</option>
-      <option value="Mounts, Jeffrey">Mounts, Jeffrey</option>
-      <option value="Newberry, Sam">Newberry, Sam</option>
-      <option value="Okoye, Chidozie">Okoye, Chidozie</option>
-      <option value="Osburn, Thomas">Osburn, Thomas</option>
-      <option value="Ozubko, Jason">Ozubko, Jason</option>
-      <option value="Padalino, Stephen">Padalino, Stephen</option>
-      <option value="Pogozelski, Edward">Pogozelski, Edward</option>
-      <option value="Sweet, Tara">Sweet, Tara</option>
-      <option value="Taber-Thomas, Bradley">Taber-Thomas, Bradley</option>
-      <option value="Van Stolk-Cooke, Cassie">Van Stolk-Cooke, Cassie</option>
-      <option value="Wade, Amy">Wade, Amy</option>
-    </select>
   </div>
 </header>
 
@@ -602,6 +707,42 @@ document.getElementById('search').addEventListener('input', e => {
   searchQuery = e.target.value;
   render();
 });
+
+// ── instructions toggle ──────────────────────────────────
+let instructionsVisible = true;
+let disclaimerVisible = true;
+let autoHidden = false;
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60 && !autoHidden) {
+    document.getElementById('instructions').classList.add('hidden');
+    document.getElementById('disclaimer').classList.add('hidden');
+    instructionsVisible = false;
+    disclaimerVisible = false;
+    autoHidden = true;
+  }
+}, { passive: true });
+
+function toggleInstructions() {
+  instructionsVisible = !instructionsVisible;
+  document.getElementById('instructions').classList.toggle('hidden', !instructionsVisible);
+}
+
+function toggleDisclaimer() {
+  disclaimerVisible = !disclaimerVisible;
+  document.getElementById('disclaimer').classList.toggle('hidden', !disclaimerVisible);
+}
+
+// ── filters toggle ───────────────────────────────────────
+let filtersVisible = true;
+
+function toggleFilters() {
+  filtersVisible = !filtersVisible;
+  const collapsible = document.getElementById('filtersCollapsible');
+  const btn = document.getElementById('filtersToggleBtn');
+  collapsible.classList.toggle('collapsed', !filtersVisible);
+  btn.classList.toggle('collapsed', !filtersVisible);
+}
 
 render();
 </script>
